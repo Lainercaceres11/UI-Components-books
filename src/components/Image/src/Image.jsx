@@ -1,27 +1,37 @@
-import { useState } from 'react'
+import { useState, forwardRef } from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 
 import css from './Image.module.scss'
 
-export const Image = ({ url, alt, title, width, addClass, noCaption, defaultStyle, lazySize, ...props }) => {
+export const Image = forwardRef(({
+  url,
+  alt,
+  title,
+  width,
+  addClass,
+  noCaption,
+  defaultStyle,
+  lazySize,
+  ...props
+}, ref) => {
   // Estado para determinar si se muestra la imagen por defecto.
   const [error, setError] = useState(false)
 
   const base = new URL('/assets/images/base-image.png', import.meta.url).href
 
   /**
-    * Función de error, al no conseguir la imagen cambia el estado setError
-    * y muestra la imagen por defecto.
-    *
-    * @param {boolean} value
-    */
+   * Función de error, al no conseguir la imagen cambia el estado setError
+   * y muestra la imagen por defecto.
+   *
+   * @param {boolean} value
+   */
   const onError = (value) => setError(value)
 
   /**
-    * Condicionamos que imagen se va a mostrar
-    * dependiendo del valor del estado error.
-    */
+   * Condicionamos que imagen se va a mostrar
+   * dependiendo del valor del estado error.
+   */
   const imgToSee = !error ? `${url}` : base
 
   return (
@@ -32,7 +42,14 @@ export const Image = ({ url, alt, title, width, addClass, noCaption, defaultStyl
       })}
       {...(width && { style: { maxWidth: `${/%/gi.test(width) ? width : `${width}px`}` } })}
     >
-      <img src={imgToSee} onError={onError} alt={alt} {...(lazySize && { ...lazySize })} {...props} />
+      <img
+        ref={ref}
+        src={imgToSee}
+        onError={onError}
+        alt={alt}
+        {...(lazySize && { ...lazySize })}
+        {...props}
+      />
 
       {!noCaption && (
         <figcaption className={css['c-image__figcaption']}>
@@ -44,7 +61,9 @@ export const Image = ({ url, alt, title, width, addClass, noCaption, defaultStyl
       )}
     </figure>
   )
-}
+})
+
+Image.displayName = 'Image'
 
 Image.defaultProps = {
   title: 'Image 1.',
